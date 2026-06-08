@@ -1,0 +1,20 @@
+name: "QR Code comment"
+description: "Comment a Pull Request with a QR code."
+author: "engineering@able.co"
+inputs:
+  repo-token:
+    description: >
+      Token for the repository. Can be passed in using `{{ secrets.GITHUB_TOKEN }}`.
+    required: false
+    default: ${{ github.token }}
+  comment:
+    description: >
+      Body of the comment. Use {qrcode} to place the QR Code.
+    required: true
+  content:
+    description: >
+      Content to encode into a QR code.
+    required: true
+runs:
+  using: "node12"
+  main: "dist/index.js"

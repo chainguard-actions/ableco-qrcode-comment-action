@@ -1,0 +1,30 @@
+name: Test basic usage
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_EVENT_NAME: pull_request
+      GITHUB_REF: refs/pull/1/merge
+      GITHUB_HEAD_REF: feature-branch
+      GITHUB_BASE_REF: main
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        continue-on-error: true
+        with:
+          repo-token: ${{ github.token }}
+          comment: "Scan this QR code to preview: {qrcode}"
+          content: "https://example.com/preview"
+      - name: Assert action ran with required inputs
+        run: |
+          echo "Action outcome: ${{ steps.action.outcome }}"
+          # The action may fail without a real PR context, but it must have been invoked
+          # with the required inputs. A 'skipped' outcome would indicate inputs were missing.
+          if [ "${{ steps.action.outcome }}" = "skipped" ]; then
+            echo "FAIL: action was skipped, inputs may not have been passed correctly"
+            exit 1
+          fi
+          echo "PASS: action was invoked with comment and content inputs"

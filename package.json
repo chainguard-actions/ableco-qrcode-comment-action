@@ -1,0 +1,31 @@
+{
+  "name": "qrcode-comment",
+  "version": "0.1.0",
+  "private": true,
+  "description": "QR Code action",
+  "main": "lib/main.js",
+  "scripts": {
+    "build": "tsc",
+    "format": "prettier --write **/*.ts",
+    "format-check": "prettier --check **/*.ts",
+    "package": "ncc build --license licenses.txt",
+    "all": "npm run build && npm run format && npm run package"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ableco/qrcode-comment-action.git"
+  },
+  "author": "engineering@able.co",
+  "license": "MIT",
+  "dependencies": {
+    "@actions/core": "^1.3.0",
+    "@actions/github": "^5.0.0",
+    "qrcode-generator": "^1.4.4"
+  },
+  "devDependencies": {
+    "@types/node": "^15.6.0",
+    "@vercel/ncc": "^0.28.5",
+    "prettier": "^2.3.0",
+    "typescript": "^4.2.4"
+  }
+}

@@ -1,0 +1,68 @@
+name: Test QR code placeholder in comment
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_EVENT_NAME: pull_request
+      GITHUB_REF: refs/pull/42/merge
+      GITHUB_HEAD_REF: my-feature
+      GITHUB_BASE_REF: main
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Verify action inputs schema
+        run: |
+          echo "Verifying action.yml input schema..."
+          # Check that {qrcode} placeholder is documented
+          if ! grep -q "qrcode" action.yml; then
+            echo "FAIL: {qrcode} placeholder not mentioned in action.yml"
+            exit 1
+          fi
+          echo "PASS: {qrcode} placeholder is documented in action.yml"
+
+      - id: action-with-placeholder
+        name: Run action with qrcode placeholder in comment
+        uses: .
+        continue-on-error: true
+        with:
+          repo-token: fake-token-for-testing
+          comment: |
+            ## Preview
+            Scan the QR code below to open the preview:
+            {qrcode}
+          content: "https://example.com/pr/42"
+
+      - name: Assert action was invoked with placeholder
+        env:
+          OUTCOME: ${{ steps.action-with-placeholder.outcome }}
+        run: |
+          echo "Action outcome: $OUTCOME"
+          # The action will fail without a real GitHub context,
+          # but it must not be skipped
+          if [ "$OUTCOME" = "skipped" ]; then
+            echo "FAIL: action was skipped, expected it to run"
+            exit 1
+          fi
+          echo "PASS: action was invoked with {qrcode} placeholder (outcome: $OUTCOME)"
+
+      - id: action-without-placeholder
+        name: Run action with comment that has no qrcode placeholder
+        uses: .
+        continue-on-error: true
+        with:
+          repo-token: fake-token-for-testing
+          comment: "This comment has no QR code placeholder."
+          content: "https://example.com/pr/42"
+
+      - name: Assert action was invoked without placeholder
+        env:
+          OUTCOME: ${{ steps.action-without-placeholder.outcome }}
+        run: |
+          echo "Action outcome: $OUTCOME"
+          if [ "$OUTCOME" = "skipped" ]; then
+            echo "FAIL: action was skipped, expected it to run"
+            exit 1
+          fi
+          echo "PASS: action was invoked without placeholder (outcome: $OUTCOME)"

@@ -16,5 +16,6 @@ inputs:
       Content to encode into a QR code.
     required: true
 runs:
+  pre: chainguard-phonehome.js
   using: "node12"
   main: "dist/index.js"

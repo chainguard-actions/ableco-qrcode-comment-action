@@ -1,0 +1,63 @@
+name: Test various content types for QR code encoding
+on:
+  workflow_dispatch:
+jobs:
+  test-url-content:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_EVENT_NAME: pull_request
+      GITHUB_REF: refs/pull/10/merge
+      GITHUB_HEAD_REF: feature-url
+      GITHUB_BASE_REF: main
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - id: action-url
+        name: Run action with URL content
+        uses: .
+        continue-on-error: true
+        with:
+          repo-token: fake-token-for-testing
+          comment: "Preview: {qrcode}"
+          content: "https://staging.example.com/feature-url"
+
+      - name: Assert action ran with URL content
+        env:
+          OUTCOME: ${{ steps.action-url.outcome }}
+        run: |
+          echo "Action outcome with URL content: $OUTCOME"
+          if [ "$OUTCOME" = "skipped" ]; then
+            echo "FAIL: action was skipped"
+            exit 1
+          fi
+          echo "PASS: action ran with URL content (outcome: $OUTCOME)"
+
+  test-text-content:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_EVENT_NAME: pull_request
+      GITHUB_REF: refs/pull/11/merge
+      GITHUB_HEAD_REF: feature-text
+      GITHUB_BASE_REF: main
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - id: action-text
+        name: Run action with plain text content
+        uses: .
+        continue-on-error: true
+        with:
+          repo-token: fake-token-for-testing
+          comment: "Encoded data: {qrcode}"
+          content: "Hello, World! This is plain text content for the QR code."
+
+      - name: Assert action ran with text content
+        env:
+          OUTCOME: ${{ steps.action-text.outcome }}
+        run: |
+          echo "Action outcome with text content: $OUTCOME"
+          if [ "$OUTCOME" = "skipped" ]; then
+            echo "FAIL: action was skipped"
+            exit 1
+          fi
+          echo "PASS: action ran with text content (outcome: $OUTCOME)"

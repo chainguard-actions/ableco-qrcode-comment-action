@@ -1,4 +1,4 @@
-name: Test basic usage
+name: Test QR code content input
 on:
   workflow_dispatch:
 jobs:
@@ -6,14 +6,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-      - name: Run action with required inputs
+      - name: Run action with URL content
         id: action
         uses: .
         with:
-          comment: "Scan this QR code: {qrcode}"
-          content: "https://example.com"
+          comment: "Deploy preview: {qrcode}"
+          content: "https://preview.example.com/pr/42"
         continue-on-error: true
-      - name: Assert action ran (no crash on startup)
+      - name: Assert action ran with URL content
         env:
           OUTCOME: ${{ steps.action.outcome }}
         run: |
